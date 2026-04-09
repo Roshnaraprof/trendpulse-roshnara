@@ -1,41 +1,70 @@
-import json
+# task2_data_processing.py
+
 import pandas as pd
 import os
 
-def load_latest_json():
-    files = os.listdir("data")
-    json_files = [f for f in files if f.endswith(".json")]
-    latest = sorted(json_files)[-1]
-    return os.path.join("data", latest)
+# -------------------------------
+# 1. Load JSON File
+# -------------------------------
 
-def clean_data(data):
-    cleaned = []
-    for item in data:
-        if not item.get("title") or not item.get("category"):
-            continue
+file_path = r"D:\AIML\trendpulse-roshnara\data\trends_20260409.json"
 
-        item["score"] = item.get("score", 0)
-        item["num_comments"] = item.get("num_comments", 0)
+# Check if file exists
+if not os.path.exists(file_path):
+    print("❌ File not found. Check the file path.")
+    exit()
 
-        cleaned.append(item)
+# Load JSON into DataFrame
+df = pd.read_json(file_path)
 
-    return cleaned
+print(f"Loaded {len(df)} stories from {file_path}\n")
 
-def main():
-    file_path = load_latest_json()
+# -------------------------------
+# 2. Clean the Data
+# -------------------------------
 
-    with open(file_path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+# Remove duplicates
+df = df.drop_duplicates(subset="post_id")
+print(f"After removing duplicates: {len(df)}")
 
-    cleaned = clean_data(data)
+# Remove missing values
+df = df.dropna(subset=["post_id", "title", "score"])
+print(f"After removing nulls: {len(df)}")
 
-    df = pd.DataFrame(cleaned)
+# Convert data types safely
+df["score"] = pd.to_numeric(df["score"], errors="coerce")
+df["num_comments"] = pd.to_numeric(df["num_comments"], errors="coerce")
 
-    output_file = "data/trends_cleaned.csv"
-    df.to_csv(output_file, index=False)
+# Drop rows where conversion failed
+df = df.dropna(subset=["score", "num_comments"])
 
-    print(f"Saved cleaned data to {output_file}")
-    print(f"Total records: {len(df)}")
+# Convert to integer
+df["score"] = df["score"].astype(int)
+df["num_comments"] = df["num_comments"].astype(int)
 
-if __name__ == "__main__":
-    main()
+# Remove low-quality stories
+df = df[df["score"] >= 5]
+print(f"After removing low scores: {len(df)}")
+
+# Clean whitespace in title
+df["title"] = df["title"].str.strip()
+
+## -------------------------------
+# 3. Save as CSV
+# -------------------------------
+
+output_path = r"D:\AIML\trendpulse-roshnara\data\trends_cleaned.csv"
+
+# Create folder if it doesn't exist
+os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+# Save file
+df.to_csv(output_path, index=False)
+
+print(f"\nSaved {len(df)} rows to {output_path}")
+# -------------------------------
+# Summary
+# -------------------------------
+
+print("\nStories per category:")
+print(df["category"].value_counts())

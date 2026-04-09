@@ -40,12 +40,14 @@ This project is divided into 4 stages:
 
 ---
 
-## Project Structure
+##  Project Structure
+
+```
 trendpulse-roshnara/
 │
 ├── data/
-│ ├── trends_YYYYMMDD.json
-│ └── trends_cleaned.csv
+│   ├── trends_YYYYMMDD.json
+│   └── trends_cleaned.csv
 │
 ├── task1_data_collection.py
 ├── task2_data_processing.py
@@ -54,4 +56,4 @@ trendpulse-roshnara/
 │
 ├── requirements.txt
 └── README.md
-
+```

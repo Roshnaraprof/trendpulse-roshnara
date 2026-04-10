@@ -46,8 +46,15 @@ This project is divided into 4 stages:
 trendpulse-roshnara/
 │
 ├── data/
-│   ├── trends_YYYYMMDD.json
-│   └── trends_cleaned.csv
+│   ├── trends_20260409.json
+│   ├── trends_cleaned.csv
+│   └── trends_analysed.csv
+│
+├── outputs/
+│   ├── chart1_top_stories.png
+│   ├── chart2_categories.png
+│   ├── chart3_scatter.png
+│   └── dashboard.png
 │
 ├── task1_data_collection.py
 ├── task2_data_processing.py
